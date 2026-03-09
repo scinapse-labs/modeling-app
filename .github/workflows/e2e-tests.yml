@@ -455,7 +455,12 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           max_timeout: 1200 # average build times are 17-18 minutes
-          check_interval: 5
+          check_interval: 30
+          vercel_protection_bypass_header: ${{ secrets.VERCEL_PROTECTION_BYPASS_SECRET }}
       - name: Check Vercel preview
         if: github.event_name == 'pull_request'
-        run: curl --fail --silent --show-error --output=/dev/null --write-out="%{http_code}" "${{ steps.wait-for-preview.outputs.url }}"
+        run: |
+          curl --fail --silent --show-error \
+            --header "x-vercel-protection-bypass: ${{ secrets.VERCEL_PROTECTION_BYPASS_SECRET }}" \
+            --output=/dev/null --write-out="%{http_code}" \
+            "${{ steps.wait-for-preview.outputs.url }}"
