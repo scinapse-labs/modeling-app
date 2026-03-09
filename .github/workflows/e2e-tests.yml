@@ -446,6 +446,7 @@ jobs:
           CI_STEP: teardown
 
   vercel:
+    name: e2e:vercel (ubuntu)
     runs-on: namespace-profile-ubuntu-2-cores
     steps:
       - name: Wait for Vercel preview
