@@ -444,3 +444,18 @@ jobs:
           CI_PR_NUMBER: ${{ github.event.pull_request.number }}
           CI_SUITE: e2e:desktop
           CI_STEP: teardown
+
+  vercel:
+    runs-on: namespace-profile-ubuntu-2-cores
+    steps:
+      - name: Wait for Vercel preview
+        if: github.event_name == 'pull_request'
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.3
+        id: wait-for-preview
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 1200 # average build times are 17-18 minutes
+          check_interval: 5
+      - name: Check Vercel preview
+        if: github.event_name == 'pull_request'
+        run: curl --fail --silent --show-error --output=/dev/null --write-out="%{http_code}" "${{ steps.wait-for-preview.outputs.url }}"
