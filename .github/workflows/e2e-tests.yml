@@ -459,10 +459,21 @@ jobs:
           check_interval: 30
           vercel_protection_bypass_header: ${{ secrets.VERCEL_PROTECTION_BYPASS_SECRET }}
       - name: Check Vercel preview
-        # if: github.event_name == 'pull_request'
-        if: always()
+        if: github.event_name == 'pull_request'
+        env:
+          PREVIEW_URL: ${{ steps.wait-for-preview.outputs.url }}
+          VERCEL_PROTECTION_BYPASS_SECRET: ${{ secrets.VERCEL_PROTECTION_BYPASS_SECRET }}
         run: |
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "No preview URL from wait step"
+            exit 1
+          fi
+          if [ -z "$VERCEL_PROTECTION_BYPASS_SECRET" ]; then
+            echo "VERCEL_PROTECTION_BYPASS_SECRET secret is not set"
+            exit 1
+          fi
           curl --fail --silent --show-error \
-            --header "x-vercel-protection-bypass: ${{ secrets.VERCEL_PROTECTION_BYPASS_SECRET }}" \
-            --output=/dev/null --write-out="%{http_code}" \
-            "${{ steps.wait-for-preview.outputs.url }}"
+            --header "x-vercel-protection-bypass: ${VERCEL_PROTECTION_BYPASS_SECRET}" \
+            --output=/dev/null \
+            --write-out="%{http_code}" \
+            "$PREVIEW_URL"
