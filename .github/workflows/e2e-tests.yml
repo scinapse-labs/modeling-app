@@ -475,6 +475,6 @@ jobs:
           fi
           curl --fail --silent --show-error \
             --header "x-vercel-protection-bypass: ${VERCEL_AUTOMATION_BYPASS_SECRET}" \
-            --output=/dev/null \
-            --write-out="%{http_code}" \
+            --output /dev/null \
+            --write-out "%{http_code}" \
             "$PREVIEW_URL"
